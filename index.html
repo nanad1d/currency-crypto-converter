@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Currency & Crypto Converter</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #E0E0E0;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .converter {
+      background: #2C2C2C;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #444444;
+      border-radius: 8px;
+      background-color: #1E1E1E;
+      color: #E0E0E0;
+    }
+
+    button {
+      width: 100%;
+      background-color: #D4AF37;
+      color: #121212;
+      cursor: pointer;
+      border: none;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 10px 14px;
+    }
+
+    button:hover {
+      background-color: #B8932F;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #E0E0E0;
+    }
+
+    .highlight {
+      font-weight: 700;
+      color: #D4AF37;
+    }
+
+    .timestamp {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #888888;
+    }
+  </style>
+</head>
+<body>
+  <h1>Konversi Mata Uang & Kripto</h1>
+  <div class="converter">
+    <input type="number" id="amount" placeholder="Masukkan jumlah" />
+    <select id="from">
+      <option value="USD">USD</option>
+      <option value="IDR">IDR</option>
+      <option value="EUR">EUR</option>
+      <option value="BTC">BTC</option>
+      <option value="ETH">ETH</option>
+    </select>
+    <select id="to">
+      <option value="IDR">IDR</option>
+      <option value="USD">USD</option>
+      <option value="EUR">EUR</option>
+      <option value="BTC">BTC</option>
+      <option value="ETH">ETH</option>
+    </select>
+    <button onclick="convert()">Konversi</button>
+    <div class="result" id="result"></div>
+    <div class="timestamp" id="timestamp"></div>
+  </div>
+
+  <script>
+    const rates = {
+      USD: 1,
+      IDR: 15500,
+      EUR: 0.92,
+      BTC: 0.000015,
+      ETH: 0.00025,
+    };
+
+    const currencyNames = {
+      USD: 'Dollar AS',
+      IDR: 'Rupiah',
+      EUR: 'Euro',
+      BTC: 'Bitcoin',
+      ETH: 'Ethereum',
+    };
+
+    function formatNumber(num, type = 'fiat') {
+      return Number(num).toLocaleString('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: type === 'crypto' ? 6 : 2,
+      });
+    }
+
+    function convert() {
+      const amount = parseFloat(document.getElementById('amount').value);
+      const from = document.getElementById('from').value;
+      const to = document.getElementById('to').value;
+      const resultDiv = document.getElementById('result');
+      const timestampDiv = document.getElementById('timestamp');
+
+      if (isNaN(amount)) {
+        resultDiv.innerHTML = '⚠️ Masukkan jumlah yang valid.';
+        timestampDiv.innerHTML = '';
+        return;
+      }
+
+      const rateFrom = rates[from];
+      const rateTo = rates[to];
+
+      const converted = (amount / rateFrom) * rateTo;
+      const isCrypto = to === 'BTC' || to === 'ETH';
+
+      resultDiv.innerHTML = `
+        <span class="highlight">${formatNumber(amount)} ${from}</span> (${currencyNames[from]}) =
+        <span class="highlight">${formatNumber(converted, isCrypto ? 'crypto' : 'fiat')} ${to}</span> (${currencyNames[to]})<br/>
+        <small>1 ${from} = ${formatNumber(rateTo / rateFrom, isCrypto ? 'crypto' : 'fiat')} ${to}</small>
+      `;
+
+      const now = new Date();
+      timestampDiv.innerHTML = `⏱️ Update terakhir: ${now.toLocaleString('id-ID')}`;
+    }
+  </script>
+</body>
+</html>
